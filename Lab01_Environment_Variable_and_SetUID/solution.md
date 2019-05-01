@@ -6,11 +6,11 @@
 
 ### 1. printenv or env
 
-![env](..\images\lab1-task1-env.png)
+![env](../images/lab1-task1-env.png)
 
 ### 2. export and unset
 
-![export_unset](..\images\lab1-task1-export_unset.png)
+![export_unset](../images/lab1-task1-export_unset.png)
 
 ## Task2: Passing Environment Variables from Parent Process to Child Process
 
@@ -104,7 +104,7 @@ cat output2
 
 ### 3. compare the difference between output and output2
 
-![diif_output](..\images\lab1-task2-diff_output.png)
+![diif_output](../images/lab1-task2-diff_output.png)
 
 ## Task 3: Environment Variables and execve()
 
@@ -119,7 +119,7 @@ gcc task3.c -o task3
 
 ### 2. 将execve中第三个参数改为environ
 
-![environ](..\images\lab1-task3-environ.png)
+![environ](../images/lab1-task3-environ.png)
 
 ### 3. How the new program gets its environment variables?
 
@@ -145,7 +145,7 @@ gcc task3.c -o task3
 
 ## Task 4: Environment Variables and system()
 
-![task4](..\images\lab1-task4.png)
+![task4](../images/lab1-task4.png)
 
 ## Task 5: Environment Variable and Set-UID Programs
 
@@ -155,13 +155,13 @@ gcc task3.c -o task3
 
 如下，可以看到`task5`拥有s权限，即set-UID。
 
-![chown_chmod](..\images\lab1-task5-ch.png)
+![chown_chmod](../images/lab1-task5-ch.png)
 
 ### 2. export
 
 接着使用export改变（添加）环境变量`LD_LIBRARY_PATH`、`L1B0`
 
-![export](F:\大三下\攻防对抗技术\images\lab1-task5-export.png)
+![export](../images/lab1-task5-export.png)
 
 可以看到环境变量`LD_LIBRARY_PATH`没被传入Set-UID子进程。
 
@@ -177,7 +177,7 @@ sudo chown root task6
 sudo chmod 4755 task6
 ```
 
-![ch6](F:\大三下\攻防对抗技术\images\lab1-task6-ch.png)
+![ch6](../images/lab1-task6-ch.png)
 
 ### 2. compile my ls program and export PATH
 
@@ -286,7 +286,7 @@ I am not sleeping!
 
 ### 1. system
 
-![system](F:\大三下\攻防对抗技术\images\lab1-task8-system.png)
+![system](../images/lab1-task8-system.png)
 
 文件`test`是在用户`seed`下创建的，可以看到`user1`和`seed`是不同的属组，故用户`user1`对文件`test`只有读权限。
 
@@ -294,7 +294,7 @@ I am not sleeping!
 
 ### 2. execve
 
-![execve](..\images\lab1-task8-execve.png)
+![execve](../images/lab1-task8-execve.png)
 
 可以看到，当使用execve函数时，原本的命令执行失败，这是因为在execve中，命令与数据是严格分离的。当我们输入`./task8 "test;trash test"`时，代表`cat `文件`test;trash test`。
 
@@ -302,8 +302,8 @@ I am not sleeping!
 
 ## Task 9: Capability Leaking
 
-![capability leak](F:\大三下\攻防对抗技术\images\lab1-task9-leak.png)
+![capability leak](../images/lab1-task9-leak.png)
 
-![whoami](F:\大三下\攻防对抗技术\images\lab1-task9-whoami.png)
+![whoami](../images/lab1-task9-whoami.png)
 
 可以看到，尽管在用户权限由root降至原本的用户，在拥有资源描述符fd的情况下，还是可以对文件进行写操作（修改）。
