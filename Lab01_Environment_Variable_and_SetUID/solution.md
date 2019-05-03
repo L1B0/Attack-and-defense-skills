@@ -1,6 +1,6 @@
 # Environment Variable and Set-UID Program Lab
 
-> Author: 1120162015 李博
+> Author: L1B0
 
 ## Task1: Manipulating Environment Variables
 
