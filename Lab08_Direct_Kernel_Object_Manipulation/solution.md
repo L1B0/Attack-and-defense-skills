@@ -18,20 +18,22 @@ hello.c代码如下
 static int hello_init(void)
 {
     struct task_struct *p;
-    p = NULL;
     p = &init_task;
-    for_each_process(p)
+    
+	while( 1 )
     {
-        if(p->mm != NULL){ // 输出非内核线程
-            printk(KERN_ALERT"%s\t%d\n",p->comm,p->pid);
-        }
+        printk(KERN_ALERT"%s\t%d\n",p->comm,p->pid);
+        p = next_task(p);
+        
+        if(p == &init_task) // 已遍历一遍链表
+            break; // 循环结束
     }
     return 0;
 }
 // 清理函数
 static void hello_exit(void)
 {
-    printk(KERN_ALERT"goodbye!\n");
+    printk(KERN_ALERT"see you~\n");
 }
 
 // 函数注册
@@ -62,6 +64,12 @@ endif
 结果部分如下图，可以看到成功将进程信息打印出来，包括进程的comm（名字等）和pid（进程号）。
 
 ![task1-result](../images/lab8-task1-result.png)
+
+### 总结
+
+该任务是在虚拟机内部，写一个内核模块打印所有进程信息。
+
+通过init_task可定位0号进程，从task_struct结构体中读取数据，即可遍历双向循环链表，打印所有进程信息。
 
 
 
@@ -141,8 +149,7 @@ Makefile和task1的Makefile一致，编译后结果如下。
 ```python
 #!/usr/bin/python
 
-def u32(s):
-        return eval('0x'+s[::-1].encode('hex'))
+u32 = lambda s: eval('0x'+s[::-1].encode('hex'))
 
 f = open("./Ubuntu-6c5f5ff8.vmem",'rb')
 
@@ -175,6 +182,7 @@ print comm
 # 2. read all proc info
 first_comm = comm # 记录第一个进程的comm
 while(1):
+    
         f.seek(next_addr+comm_offset-tasks_offset,0)
         comm = f.read(16)
         # 双向链表到达结尾，结束
@@ -191,6 +199,12 @@ while(1):
         print "[next_addr] -> {}".format(hex(next_addr))
 ```
 
-结果部分截图如下
+结果部分截图如下，成功打印出了所有的进程的pid和comm信息。
 
 ![task2-result](../images/lab8-task2-result.png)
+
+### 总结
+
+该任务是分析虚拟机的内存镜像，由于init_task（0号进程）在PCB链表中的特殊位置（头），可以用来定位到所有进程控制块。
+
+所以只要获取到init_task的虚拟地址，减去`0xc0000000`得到物理地址，就可以读取其task_struct的所有信息，从而遍历双向循环链表输出所有进程信息。

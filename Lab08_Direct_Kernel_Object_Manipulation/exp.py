@@ -1,7 +1,6 @@
 ﻿#!/usr/bin/python
 
-def u32(s):
-        return eval('0x'+s[::-1].encode('hex'))
+u32 = lambda s: eval('0x'+s[::-1].encode('hex'))
 
 f = open("./Ubuntu-6c5f5ff8.vmem",'rb')
 
@@ -34,6 +33,7 @@ print comm
 # 2. read all proc info
 first_comm = comm # 记录第一个进程的comm
 while(1):
+    
         f.seek(next_addr+comm_offset-tasks_offset,0)
         comm = f.read(16)
         # 双向链表到达结尾，结束
