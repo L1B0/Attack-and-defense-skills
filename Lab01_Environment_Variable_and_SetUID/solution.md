@@ -1,20 +1,55 @@
 # Environment Variable and Set-UID Program Lab
 
-> Author: L1B0
+> Author: 1120162015 李博
 
 ## Task1: Manipulating Environment Variables
 
 ### 1. printenv or env
 
-![env](../images/lab1-task1-env.png)
+使用`printenv`和`env`打印环境变量，并用`grep`过滤关键字。
+
+![env](..\images\lab1-task1-env.png)
 
 ### 2. export and unset
 
-![export_unset](../images/lab1-task1-export_unset.png)
+使用`export USER=L1B0`添加环境变量，并用`printenv`验证，然后使用`unset`将环境变量销毁。
+
+![export_unset](..\images\lab1-task1-export_unset.png)
 
 ## Task2: Passing Environment Variables from Parent Process to Child Process
 
 ### 1. compile and run
+
+代码如下
+
+```c
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+extern char **environ;
+void printenv()
+{
+	int i = 0;
+	while (environ[i] != NULL) {
+	printf("%s\n", environ[i]);
+	i++;
+	}
+}
+void main()
+{
+	pid_t childPid;
+	switch(childPid = fork()) {
+		case 0:  /*child process*/
+			printenv();
+			exit(0);
+		default:  /*parent process*/
+		//printenv();
+			exit(0);
+	}
+}
+```
+
+使用如下命令编译并运行程序。
 
 ```shell
 gcc task2.c -o task2
@@ -22,9 +57,9 @@ gcc task2.c -o task2
 cat output
 ```
 
-运行结果如下
+运行结果如下。
 
-```
+```shell
 XDG_VTNR=7
 XDG_SESSION_ID=c1
 XDG_GREETER_DATA_DIR=/var/lib/lightdm-data/seed
@@ -104,22 +139,46 @@ cat output2
 
 ### 3. compare the difference between output and output2
 
-![diif_output](../images/lab1-task2-diff_output.png)
+使用`diff`命令比较以上两步生成的结果，如下图，可以看到两个结果相同。
+
+![diif_output](..\images\lab1-task2-diff_output.png)
 
 ## Task 3: Environment Variables and execve()
 
 ### 1. compile and run
+
+代码如下
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+extern char **environ;
+
+int main()
+{
+	char *argv[2];
+	argv[0] = "/usr/bin/env";
+	argv[1] = NULL;
+	execve("/usr/bin/env", argv, NULL);
+
+	return 0 ;
+}
+```
+
+使用以下shell命令编译并运行程序。
 
 ```shell
 gcc task3.c -o task3
 ./task3
 ```
 
-无输出
+结果输出为空。
 
 ### 2. 将execve中第三个参数改为environ
 
-![environ](../images/lab1-task3-environ.png)
+代码及结果如下图，可以看到将execve的第三个参数改为environ后程序输出为环境变量。
+
+![environ](..\images\lab1-task3-environ.png)
 
 ### 3. How the new program gets its environment variables?
 
@@ -145,7 +204,9 @@ gcc task3.c -o task3
 
 ## Task 4: Environment Variables and system()
 
-![task4](../images/lab1-task4.png)
+代码及结果如下图，可以看到程序输出为环境变量。
+
+![task4](..\images\lab1-task4.png)
 
 ## Task 5: Environment Variable and Set-UID Programs
 
@@ -155,13 +216,13 @@ gcc task3.c -o task3
 
 如下，可以看到`task5`拥有s权限，即set-UID。
 
-![chown_chmod](../images/lab1-task5-ch.png)
+![chown_chmod](..\images\lab1-task5-ch.png)
 
 ### 2. export
 
 接着使用export改变（添加）环境变量`LD_LIBRARY_PATH`、`L1B0`
 
-![export](../images/lab1-task5-export.png)
+![export](..\images\lab1-task5-export.png)
 
 可以看到环境变量`LD_LIBRARY_PATH`没被传入Set-UID子进程。
 
@@ -171,13 +232,27 @@ gcc task3.c -o task3
 
 ### 1. compile and chown and chmod
 
+代码如下
+
+```c
+#include <stdio.h>
+
+int main()
+{
+	system("ls");
+	return 0;
+}
+```
+
+使用以下命令编译代码，并改变可执行文件的拥有者为root，设置为set-uid程序。
+
 ```shell
 gcc task6.c  -o task6
 sudo chown root task6
 sudo chmod 4755 task6
 ```
 
-![ch6](../images/lab1-task6-ch.png)
+![ch6](..\images\lab1-task6-ch.png)
 
 ### 2. compile my ls program and export PATH
 
@@ -217,6 +292,20 @@ Oh, it's L1B0's ls!
 
 ### 1. compile and LD_PRELOAD
 
+`mylib.c`代码如下
+
+```c
+#include <stdio.h>
+void sleep (int s)
+{
+	/*If this is invoked by a privileged program,
+	you can do damages here!*/
+	printf("I am not sleeping!\n");
+}
+```
+
+使用如下命令将源码编译为动态链接库，并改变源程序的链接库为`libmylib.so.1.0.1`。
+
 ```shell
 gcc -fPIC -g -c mylib.c
 gcc -shared -o libmylib.so.1.0.1 mylib.o -lc
@@ -225,6 +314,8 @@ export LD_PRELOAD=./libmylib.so.1.0.1
 ```
 
 ### 2. run in different environments
+
+三种情况的执行过程和结果如下。
 
 * Make myprog a regular program, and run it as a normal user.
 
@@ -286,7 +377,7 @@ I am not sleeping!
 
 ### 1. system
 
-![system](../images/lab1-task8-system.png)
+![system](..\images\lab1-task8-system.png)
 
 文件`test`是在用户`seed`下创建的，可以看到`user1`和`seed`是不同的属组，故用户`user1`对文件`test`只有读权限。
 
@@ -294,7 +385,7 @@ I am not sleeping!
 
 ### 2. execve
 
-![execve](../images/lab1-task8-execve.png)
+![execve](..\images\lab1-task8-execve.png)
 
 可以看到，当使用execve函数时，原本的命令执行失败，这是因为在execve中，命令与数据是严格分离的。当我们输入`./task8 "test;trash test"`时，代表`cat `文件`test;trash test`。
 
@@ -302,8 +393,57 @@ I am not sleeping!
 
 ## Task 9: Capability Leaking
 
-![capability leak](../images/lab1-task9-leak.png)
+`task9.c`源码如下
 
-![whoami](../images/lab1-task9-whoami.png)
+```C
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
-可以看到，尽管在用户权限由root降至原本的用户，在拥有资源描述符fd的情况下，还是可以对文件进行写操作（修改）。
+void main()
+{ 
+	int fd;
+	/*Assume that /etc/zzz is an important system file,
+	*and it is owned by root with permission 0644.
+	*Before running this program, you should creat
+	*the file /etc/zzz first.*/
+	fd = open("/etc/zzz", O_RDWR | O_APPEND);
+	if (fd == -1) {
+		printf("Cannot open /etc/zzz\n");
+		exit(0);
+	}
+	
+	/*Simulate the tasks conducted by the program*/
+	sleep(1);
+	
+	/*After the task, the root privileges are no longer needed,
+	it’s time to relinquish the root privileges permanently.*/
+	system("whoami");
+	setuid(getuid());  /*getuid() returns the real uid*/
+	system("whoami");	
+	if (fork()) { /*In the parent process*/
+		close (fd);
+		exit(0);
+	} 
+	else { /*in the child process*/
+	/*Now, assume that the child process is compromised, malicious
+	attackers have injected the following statements
+	into this process*/
+		system("whoami");	
+		write (fd, "Malicious Data\n", 15);
+		close (fd);
+	}
+}
+```
+
+执行结果如下
+
+![capability leak](..\images\lab1-task9-leak.png)
+
+在拥有资源描述符(fd)的情况下可以对高权限的文件进行写操作。
+
+这里使用`system("whoami")`查看程序运行时拥有的权限，验证上述想法。
+
+![whoami](..\images\lab1-task9-whoami.png)
+
+可以看到，尽管在用户权限由root降至普通用户seed，在拥有资源描述符fd的情况下，还是可以对文件进行写操作（修改）。
