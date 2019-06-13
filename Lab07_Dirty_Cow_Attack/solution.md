@@ -138,4 +138,4 @@ void *madviseThread(void *arg)
 
 ![task2-result](../images/lab7-task2-result.png)
 
-可以看到用户`l1b0`拥有了root权限。
+可以看到用户`l1b0`拥有了root权限，原理和task1相同，只是修改对象变为`/etc/passwd`。
